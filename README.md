@@ -29,7 +29,7 @@ This code listing sets the `datatype` parameter to `binary` in the `function.jso
 
 ## Function implementation
 
-The sample uses [Jimp](https://github.com/oliver-moran/jimp) resize an incoming buffer to a thumbnail. The buffer is then converted to a stream (as required by [createBlockBlobFromStream](https://docs.microsoft.com/en-us/javascript/api/azure-storage/blobservice?view=azure-node-latest#createblockblobfromstream-container--blob---stream---streamlength--options--callback-)) and uploaded to Azure Storage.
+The sample uses [Jimp](https://github.com/oliver-moran/jimp) to resize an incoming buffer to a thumbnail. The buffer is then converted to a stream (as required by [createBlockBlobFromStream](https://docs.microsoft.com/en-us/javascript/api/azure-storage/blobservice?view=azure-node-latest#createblockblobfromstream-container--blob---stream---streamlength--options--callback-)) and uploaded to Azure Storage.
 
 
 ```javascript
