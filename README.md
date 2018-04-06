@@ -1,57 +1,68 @@
-# Project Name
 
-(short, 1-3 sentenced, description of the project)
+# Azure Storage Blob Trigger Image Resize Function in Node.js
 
-## Features
+This sample implements a function triggered by Azure Blob Storage to resize an image in Node.js. Once the image is resized, the thumbnail image is uploaded back to blob storage.
 
-This project framework provides the following features:
+The key aspects of this sample are in the function bindings and function implementation.
 
-* Feature 1
-* Feature 2
-* ...
+## Function bindings
+In order to interface with image data, you need to configure the function to process data a binary data.
 
-## Getting Started
+This code listing sets the `datatype` parameter to `binary` in the `function.json` file.
 
-### Prerequisites
-
-(ideally very short, if any)
-
-- OS
-- Library version
-- ...
-
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [respository name]
-3. ...
+```javascript
+{
+  "disabled": false,
+  "bindings": [
+    {
+      "name": "myBlob",
+      "type": "blobTrigger",
+      "direction": "in",
+      "path": "images/{name}",
+      "connection": "AzureWebJobsStorage",
+      "datatype": "binary" // required to process buffer as image
+    }
+  ]
+}
+```
 
 
-## Demo
+## Function implementation
 
-A demo app is included to show how to use the project.
+The sample uses [Jimp](https://github.com/oliver-moran/jimp) resize an incoming buffer to a thumbnail. The buffer is then converted to a stream (as required by [createBlockBlobFromStream](https://docs.microsoft.com/en-us/javascript/api/azure-storage/blobservice?view=azure-node-latest#createblockblobfromstream-container--blob---stream---streamlength--options--callback-)) and uploaded to Azure Storage.
 
-To run the demo, follow these steps:
 
-(Add steps to start up the demo)
+```javascript
+const stream = require('stream');
+const Jimp = require('jimp');
 
-1.
-2.
-3.
+const storage = require('azure-storage');
+const blobService = storage.createBlobService();
 
-## Resources
+module.exports = (context, myBlob) => {
 
-(Any additional resources or related projects)
+    const widthInPixels = 100;
+    const blobName = context.bindingData.name;
+    const contentType = context.bindingData.properties.contentType;
 
-- Link to supporting information
-- Link to similar sample
-- ...
+    Jimp.read(myBlob).then((thumbnail) => {
+
+        thumbnail.resize(widthInPixels, Jimp.AUTO);
+
+        const options = {
+            contentSettings: { contentType: contentType }
+        };
+
+        thumbnail.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+
+            const readStream = stream.PassThrough();
+            readStream.end(buffer);
+
+            blobService.createBlockBlobFromStream('thumbnails', blobName, readStream, buffer.length, options, (err) => {
+                context.done();
+            });
+        });
+
+    }).catch(context.log);
+};
+```
