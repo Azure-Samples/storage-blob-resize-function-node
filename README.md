@@ -3,12 +3,12 @@
 
 This sample implements a function triggered by Azure Blob Storage to resize an image in Node.js. Once the image is resized, the thumbnail image is uploaded back to blob storage.
 
-The key aspects of this sample are in the function bindings and function implementation.
+The key aspects of this sample are in the function bindings and implementation.
 
 ## Function bindings
-In order to interface with image data, you need to configure the function to process data a binary data.
+In order to interface with image data, you need to configure the function to process binary data.
 
-This code listing sets the `datatype` parameter to `binary` in the `function.json` file.
+The following code sets the `datatype` parameter to `binary` in the `function.json` file.
 
 ```javascript
 {
@@ -66,3 +66,5 @@ module.exports = (context, myBlob) => {
     }).catch(context.log);
 };
 ```
+
+You can use the [Azure Storage Explorer](https://azure.microsoft.com/features/storage-explorer/) to view blob containers and verify the resize is successful.
