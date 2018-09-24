@@ -84,3 +84,6 @@ local.settings.json
 
 node_modules
 .vscode
+
+# Functions local settings
+local.settings.json
