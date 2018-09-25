@@ -1,6 +1,11 @@
 {
   "disabled": false,
   "bindings": [
+      {
+      "type": "eventGridTrigger",
+      "name": "myEvent",
+      "direction": "in"
+    },
     {
       "name": "myBlob",
       "type": "blobTrigger",
