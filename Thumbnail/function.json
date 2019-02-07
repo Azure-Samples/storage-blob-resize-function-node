@@ -8,7 +8,7 @@
     },
     {
       "name": "myBlob",
-      "type": "blobTrigger",
+      "type": "blob",
       "direction": "in",
       "path": "images/{name}",
       "connection": "AzureWebJobsStorage",
