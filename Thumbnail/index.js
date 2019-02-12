@@ -4,26 +4,21 @@ const Jimp = require('jimp');
 const storage = require('azure-storage');
 const blobService = storage.createBlobService();
 
-module.exports = (context, myBlob) => {
+module.exports = (context, myEvent, myBlob) => {
 
-    const widthInPixels = 100;
-    const blobName = context.bindingData.name;
-    const contentType = context.bindingData.properties.contentType;
+  const widthInPixels = process.env.THUMBNAIL_WIDTH;
+  const blobName = myEvent.subject.split('/')[6];
 
     Jimp.read(myBlob).then((thumbnail) => {
 
         thumbnail.resize(widthInPixels, Jimp.AUTO);
-
-        const options = {
-            contentSettings: { contentType: contentType }
-        };
 
         thumbnail.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
 
-            blobService.createBlockBlobFromStream('thumbnails', blobName, readStream, buffer.length, options, (err) => {
+            blobService.createBlockBlobFromStream('thumbnails', blobName, readStream, buffer.length, (err) => {
                 context.done();
             });
         });
