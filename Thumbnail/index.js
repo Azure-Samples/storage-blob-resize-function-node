@@ -6,7 +6,7 @@ const blobService = storage.createBlobService();
 
 module.exports = (context, myEvent, myBlob) => {
 
-  const widthInPixels = process.env.THUMBNAIL_WIDTH;
+  const widthInPixels = Number(process.env.THUMBNAIL_WIDTH);
   const blobName = myEvent.subject.split('/')[6];
 
     Jimp.read(myBlob).then((thumbnail) => {
