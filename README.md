@@ -1,3 +1,12 @@
+---
+page_type: sample
+languages:
+- javascript
+products:
+- azure
+description: "This sample implements a function triggered by Azure Blob Storage to resize an image in Node.js."
+urlFragment: storage-blob-resize-function-node
+---
 
 # Azure Storage Blob Trigger Image Resize Function in Node.js
 
