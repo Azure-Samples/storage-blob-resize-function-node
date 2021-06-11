@@ -1,27 +1,37 @@
-const stream = require('stream');
 const Jimp = require('jimp');
+const stream = require('stream');
+const {
+    BlockBlobClient
+} = require("@azure/storage-blob");
 
-const storage = require('azure-storage');
-const blobService = storage.createBlobService();
+const ONE_MEGABYTE = 1024 * 1024;
+const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
-module.exports = (context, myEvent, myBlob) => {
+const containerName = process.env.BLOB_CONTAINER_NAME;
+const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+const blobName = process.env.OUT_BLOB_NAME;
 
-  const widthInPixels = process.env.THUMBNAIL_WIDTH;
-  const blobName = myEvent.subject.split('/')[6];
-
-    Jimp.read(myBlob).then((thumbnail) => {
+module.exports = async function (context, eventGridEvent, inputBlob){
+    const widthInPixels = 100;
+    Jimp.read(inputBlob).then((thumbnail) => {
 
         thumbnail.resize(widthInPixels, Jimp.AUTO);
 
-        thumbnail.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+        thumbnail.getBuffer(Jimp.MIME_PNG, async (err, buffer) => {
 
             const readStream = stream.PassThrough();
             readStream.end(buffer);
 
-            blobService.createBlockBlobFromStream('thumbnails', blobName, readStream, buffer.length, (err) => {
-                context.done();
-            });
+            const blobClient = new BlockBlobClient(connectionString, containerName, blobName);
+            
+            try {
+                await blobClient.uploadStream(readStream,
+                    uploadOptions.bufferSize,
+                    uploadOptions.maxBuffers,
+                    { blobHTTPHeaders: { blobContentType: "image/jpeg" } });
+            } catch (err) {
+                context.log(err.message);
+            }
         });
-
-    }).catch(context.log);
+    });
 };
