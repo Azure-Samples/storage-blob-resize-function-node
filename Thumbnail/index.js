@@ -9,9 +9,11 @@ const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
 const containerName = process.env.BLOB_CONTAINER_NAME;
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-const blobName = process.env.OUT_BLOB_NAME;
 
 module.exports = async function (context, eventGridEvent, inputBlob){
+    
+    const blobUrl = context.bindingData.data.url;
+    const blobName = blobUrl.slice(blobUrl.lastIndexOf("/")+1);
     const widthInPixels = 100;
     Jimp.read(inputBlob).then((thumbnail) => {
 
