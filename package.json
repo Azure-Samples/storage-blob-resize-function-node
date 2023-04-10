@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@azure/storage-blob": "^12.6.0",
-    "jimp": "^0.2.28"
+    "jimp": "^0.22.7"
   },
   "devDependencies": {},
   "scripts": {
